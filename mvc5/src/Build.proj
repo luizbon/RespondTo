@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildCommunityTasksPath>$(MSBuildProjectDirectory)\.build</MSBuildCommunityTasksPath>
+    <NuGetApp>$(MSBuildProjectDirectory)\NuGet\nuget.exe</NuGetApp>
+    <PackageDir>$(MSBuildProjectDirectory)\PackageSource</PackageDir>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildCommunityTasksPath)\MSBuild.Community.Tasks.targets"/>
+
+  <!-- Version Number -->
+  <PropertyGroup Condition=" '$(BUILD_NUMBER)' == '' ">
+    <Version>1.0.0.0</Version>
+    <FileVersion>1.0.0.0</FileVersion>
+    <InformationalVersion>1.0.0.0</InformationalVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(BUILD_NUMBER)' != '' ">
+    <!-- Build Server Number -->
+    <Version>1.0.0.0</Version>
+    <FileVersion>$(BUILD_NUMBER)</FileVersion>
+    <InformationalVersion>$(BUILD_NUMBER)</InformationalVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(BuildConfiguration)' == '' ">
+    <BuildConfiguration>Release</BuildConfiguration>
+  </PropertyGroup>
+
+  <Target Name="Clean">
+    <DeleteTree Directories="**\obj\**;**\bin\**" />
+  </Target>
+
+  <Target Name="Version">
+    <Time>
+      <Output TaskParameter="Year" PropertyName="Year" />
+    </Time>
+
+    <GitVersion LocalPath="$(SolutionDir)" Short="false">
+      <Output TaskParameter="CommitHash" PropertyName="GitHash" />
+    </GitVersion>
+
+    <Version VersionFile="AssemblyVersionInfo.txt" BuildType="Increment" RevisionType="Automatic">
+      <Output TaskParameter="Major" PropertyName="Major" />
+      <Output TaskParameter="Minor" PropertyName="Minor" />
+      <Output TaskParameter="Build" PropertyName="Build" />
+      <Output TaskParameter="Revision" PropertyName="Revision" />
+    </Version>
+    
+    <Message Text="Version: $(Major).$(Minor).$(Build).$(Revision) (git $(GitHash))"/>
+
+    <Attrib Files="$(MSBuildProjectDirectory)\VersionAssemblyInfo.cs" ReadOnly="False" />
+
+    <AssemblyInfo CodeLanguage="CS"
+				  OutputFile="$(MSBuildProjectDirectory)\VersionAssemblyInfo.cs"
+				  AssemblyInformationalVersion="$(Major).$(Minor).$(Build).$(Revision) (git $(GitHash))"
+				  AssemblyVersion="$(Major).$(Minor).$(Build).$(Revision)"
+				  AssemblyFileVersion="$(Major).$(Minor).$(Build).$(Revision)" />
+  </Target>  
+  
+  <!-- Projects to Build -->
+  <ItemGroup>
+    <SolutionFiles Include="$(MSBuildProjectDirectory)\**\*.sln">
+      <Properties>Configuration=$(BuildConfiguration)</Properties>
+    </SolutionFiles>
+    <NuspecFiles Include="$(MSBuildProjectDirectory)\**\*.nuspec" />
+  </ItemGroup>
+  
+  <Target Name="Package" DependsOnTargets="Compile">
+    <Exec WorkingDirectory="$(MSBuildProjectDirectory)"
+          Command="$(NuGetApp) pack %(NuspecFiles.RelativeDir)%(NuspecFiles.Filename).csproj -Verbosity detailed -Prop Configuration=Release" />
+  </Target>
+  
+  <Target Name="MovePackages" DependsOnTargets="Package">
+    <RemoveDir Directories="$(PackageDir)" Condition="Exists($(PackageDir))" />
+    <MakeDir Directories="$(PackageDir)" />
+    <!-- Using command line because I want to be sure to get the most up to date list of *.nupkg -->
+    <Exec WorkingDirectory="$(MSBuildProjectDirectory)"
+          Command="move /y *.nupkg &quot;$(PackageDir)&quot;" />
+  </Target>
+  
+  <Target Name="Push" DependsOnTargets="MovePackages">
+	<ItemGroup>
+		<NupckFiles Include="$(PackageDir)\**\*.nupkg" />
+	</ItemGroup>
+	<Exec WorkingDirectory="$(MSBuildProjectDirectory)"
+		  Command="$(NuGetApp) push %(NupckFiles.Identity) -Verbosity detailed" />
+  </Target>
+  
+  <Target Name="Compile" DependsOnTargets="Clean;Version">
+    <MSBuild Projects="@(SolutionFiles)" />
+  </Target>
+
+  <Target Name="Build">
+    <CallTarget Targets="Compile" />
+  </Target>
+
+</Project>

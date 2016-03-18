@@ -10,7 +10,7 @@ namespace RespondTo.Mvc5
         {
             AreaRegistration.RegisterAllAreas();
             RouteConfig.RegisterRoutes(RouteTable.Routes);
-            Route.RespondTo.Json().Xml().Register();
+            Route.RespondTo.Json().Register();
         }
     }
 }

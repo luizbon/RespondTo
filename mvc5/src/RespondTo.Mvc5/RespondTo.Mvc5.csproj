@@ -48,6 +48,22 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.JsonResult, Version=1.0.5778.10762, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.JsonResult.1.0.5778.10762\lib\net40\Newtonsoft.JsonResult.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="RespondTo.Json, Version=1.0.44.58765, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RespondTo.Json.1.0.44.58765\lib\net45\RespondTo.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="RespondTo.Mvc, Version=1.0.44.58765, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RespondTo.Mvc.1.0.44.58765\lib\net45\RespondTo.Mvc.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -118,17 +134,9 @@
     <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\RespondTo.Json\RespondTo.Json.csproj">
-      <Project>{3f790ade-6c2e-4322-9f69-b7dc5a7c3197}</Project>
-      <Name>RespondTo.Json</Name>
-    </ProjectReference>
     <ProjectReference Include="..\RespondTo.Xml\RespondTo.Xml.csproj">
       <Project>{01eb0d74-8369-402f-b00b-dfa1e260d343}</Project>
       <Name>RespondTo.Xml</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\RespondTo\RespondTo.csproj">
-      <Project>{a1c3cb43-eb7d-4b95-9a3e-d873abfd01fd}</Project>
-      <Name>RespondTo</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
