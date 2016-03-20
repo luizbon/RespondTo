@@ -1,0 +1,93 @@
+﻿@model Demo.Models.RespondToViewModel
+
+@{
+    ViewBag.Title = "Respond To";
+}
+
+@section scripts
+{
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.2/angular.js"></script>
+    <script>
+        angular.module('demo', [])
+            .run(function($http) {
+                $http.defaults.headers.common.Accept = 'application/json';
+            })
+            .controller('DemoController', function($http) {
+                var ctrl = this;
+
+                ctrl.currentPage = @Model.CurrentPage;
+                ctrl.hasNextPage = @Model.HasNextPage === 1;
+                ctrl.hasPrevPage = @Model.HasPrevPage === 1;
+                ctrl.totalPages = @Model.TotalPages;
+
+                ctrl.list = [];
+
+                @foreach (var respondToViewModel in Model.Items)
+                {
+                    @Html.Raw($"ctrl.list.push('{respondToViewModel}');")
+                }
+
+                ctrl.nextPage = function() {
+                    if(ctrl.hasNextPage)
+                        getResultsPage(ctrl.currentPage + 1);
+                };
+
+                ctrl.prevPage = function() {
+                    if(ctrl.hasPrevPage)
+                        getResultsPage(ctrl.currentPage - 1);
+                }
+
+                function getResultsPage(pageNumber) {
+                    // this is just an example, in reality this stuff should be in a service
+                    $http.get('@Url.Action("Index", "RespondTo")?page=' + pageNumber)
+                        .then(function (result) {
+                            ctrl.list = result.data.Items;
+                            ctrl.currentPage = result.data.CurrentPage;
+                            ctrl.hasNextPage = result.data.HasNextPage === 1;
+                            ctrl.hasPrevPage = result.data.HasPrevPage === 1;
+                            ctrl.totalPages = result.data.TotalPages;
+                        });
+                }
+
+                return ctrl;
+            })
+    </script>
+}
+
+<h2>RespondTo</h2>
+
+<div ng-app="demo">
+    <div ng-controller="DemoController as ctrl">
+        <table class="table table-bordered table-condensed">
+            <thead>
+                <tr>
+                    <th>
+                        Text
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="text in ctrl.list">
+                    <td>{{text}}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <nav>
+            <ul class="pagination">
+                <li ng-class="{disabled: !ctrl.hasPrevPage}">
+                    <a ng-click="ctrl.prevPage()" href="#">
+                        <span>&laquo;</span>
+                    </a>
+                </li>
+                <li ng-class="{disabled: !ctrl.hasNextPage}">
+                    <a ng-click="ctrl.nextPage()" href="#">
+                        <span>&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <span>Page {{ctrl.currentPage}} of {{ctrl.totalPages}}</span>
+    </div>
+</div>
