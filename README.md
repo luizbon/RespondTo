@@ -1,15 +1,27 @@
-# RespondTo
-An easy way to have multiple outputs from your ordinary actions
+# An easy way to respond in different types
+Since I've seen RoR respond_to I always wanted a way to do this multiple response type from an Action, that's why I've created RespondTo
 
-With RespondTo is possible to get customized outputs for every action in a project with minimal effort.
+With RespondTo is possible to customize outputs for actions with minimal effort.
 
-So far it has two output implementations (JSON and XML) and they can be installed via Nuget.
+##Description
+RespondTo works with extensions, so if you want to output json files, its necessary to use the json extension, for xml the xml extension and so forth.
+After an extension installed and registered actions will start to respond models as based on url extension or Accept headers.
 
-### Install-Package RespondTo.Json
-### Install-Package RespondTo.Xml
+##Installation
+    Install-Package RespondTo
+Since RespondTo works with extensions, only this package isn't enough, is necessary to install an extension or create your own.  
 
-After instalation its necessary to register routes putting one line of code in initialization.
+Currently exists two extensions:
+* RespondTo.Json
+* RespondTo.Xml
 
-#### Route.RespondTo.Json().Register()
-#### Route.RespondTo.Xml().Register()
-#### Route.RespondTo.Json().Xml().Register()
+##Usage
+To use RespondTo is necessary just register extensions on your startup code, ex:
+
+    using Route = RespondTo.Route;
+    ...
+    Route.RespondTo.Json().Register();
+    //or register xml
+    Route.RespondTo.Xml().Register();
+    //or even register multiple extensions
+    Route.RespondTo.Json().Xml().Register();
